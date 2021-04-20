@@ -1,16 +1,16 @@
-import {Alias} from "./Alias";
-import {ObjectLiteral} from "../common/ObjectLiteral";
-import {OrderByCondition} from "../find-options/OrderByCondition";
-import {JoinAttribute} from "./JoinAttribute";
-import {RelationIdAttribute} from "./relation-id/RelationIdAttribute";
-import {RelationCountAttribute} from "./relation-count/RelationCountAttribute";
-import {Connection} from "../connection/Connection";
-import {EntityMetadata} from "../metadata/EntityMetadata";
-import {SelectQuery} from "./SelectQuery";
-import {ColumnMetadata} from "../metadata/ColumnMetadata";
-import {RelationMetadata} from "../metadata/RelationMetadata";
-import {QueryBuilder} from "./QueryBuilder";
-import {SelectQueryBuilderOption} from "./SelectQueryBuilderOption";
+import { Alias } from "./Alias";
+import { ObjectLiteral } from "../common/ObjectLiteral";
+import { OrderByCondition } from "../find-options/OrderByCondition";
+import { JoinAttribute } from "./JoinAttribute";
+import { RelationIdAttribute } from "./relation-id/RelationIdAttribute";
+import { RelationCountAttribute } from "./relation-count/RelationCountAttribute";
+import { Connection } from "../connection/Connection";
+import { EntityMetadata } from "../metadata/EntityMetadata";
+import { SelectQuery } from "./SelectQuery";
+import { ColumnMetadata } from "../metadata/ColumnMetadata";
+import { RelationMetadata } from "../metadata/RelationMetadata";
+import { QueryBuilder } from "./QueryBuilder";
+import { SelectQueryBuilderOption } from "./SelectQueryBuilderOption";
 
 /**
  * Contains all properties of the QueryBuilder that needs to be build a final query.
@@ -39,7 +39,7 @@ export class QueryExpressionMap {
     /**
      * Represents query type. QueryBuilder is able to build SELECT, UPDATE and DELETE queries.
      */
-    queryType: "select"|"update"|"delete"|"insert"|"relation"|"soft-delete"|"restore" = "select";
+    queryType: "select" | "update" | "delete" | "insert" | "relation" | "soft-delete" | "restore" = "select";
 
     /**
      * Data needs to be SELECT-ed.
@@ -65,12 +65,12 @@ export class QueryExpressionMap {
      * If update query was used, it needs "update set" - properties which will be updated by this query.
      * If insert query was used, it needs "insert set" - values that needs to be inserted.
      */
-    valuesSet?: ObjectLiteral|ObjectLiteral[];
+    valuesSet?: ObjectLiteral | ObjectLiteral[];
 
     /**
      * Optional returning (or output) clause for insert, update or delete queries.
      */
-    returning: string|string[];
+    returning: string | string[];
 
     /**
      * Extra returning columns to be added to the returning statement if driver supports it.
@@ -85,7 +85,7 @@ export class QueryExpressionMap {
     /**
      * Optional on ignore statement used in insertion query in databases.
      */
-    onIgnore: string|boolean = false;
+    onIgnore: string | boolean = false;
 
     /**
      * Optional on update statement used in insertion query in databases.
@@ -110,12 +110,12 @@ export class QueryExpressionMap {
     /**
      * WHERE queries.
      */
-    wheres: { type: "simple"|"and"|"or", condition: string }[] = [];
+    wheres: { type: "simple" | "and" | "or", condition: string }[] = [];
 
     /**
      * HAVING queries.
      */
-    havings: { type: "simple"|"and"|"or", condition: string }[] = [];
+    havings: { type: "simple" | "and" | "or", condition: string }[] = [];
 
     /**
      * ORDER BY queries.
@@ -150,12 +150,12 @@ export class QueryExpressionMap {
     /**
      * Locking mode.
      */
-    lockMode?: "optimistic"|"pessimistic_read"|"pessimistic_write"|"dirty_read"|"pessimistic_partial_write"|"pessimistic_write_or_fail"|"for_no_key_update";
+    lockMode?: "optimistic" | "pessimistic_read" | "pessimistic_write" | "dirty_read" | "pessimistic_partial_write" | "pessimistic_write_or_fail" | "for_no_key_update";
 
     /**
      * Current version of the entity, used for locking.
      */
-    lockVersion?: number|Date;
+    lockVersion?: number | Date;
 
     /**
      * Tables to be specified in the "FOR UPDATE OF" clause, referred by their alias
@@ -241,7 +241,7 @@ export class QueryExpressionMap {
     /**
      * Entity (target) which relations will be updated.
      */
-    of: any|any[];
+    of: any | any[];
 
     /**
      * List of columns where data should be inserted.
@@ -330,7 +330,7 @@ export class QueryExpressionMap {
     /**
      * Creates a new alias and adds it to the current expression map.
      */
-    createAlias(options: { type: "from"|"select"|"join"|"other", name?: string, target?: Function|string, tablePath?: string, subQuery?: string, metadata?: EntityMetadata }): Alias {
+    createAlias(options: { type: "from" | "select" | "join" | "other", name?: string, target?: Function | string, tablePath?: string, subQuery?: string, metadata?: EntityMetadata }): Alias {
 
         let aliasName = options.name;
         if (!aliasName && options.tablePath)
@@ -369,7 +369,15 @@ export class QueryExpressionMap {
         return alias;
     }
 
-    findColumnByAliasExpression(aliasExpression: string): ColumnMetadata|undefined {
+    /**
+     * Finds alias with the given name.
+     * If alias was not found it throw an exception.
+     */
+    findAliasByNameOrNull(aliasName: string): Alias | undefined {
+        return this.aliases.find(alias => alias.name === aliasName);
+    }
+
+    findColumnByAliasExpression(aliasExpression: string): ColumnMetadata | undefined {
         const [aliasName, propertyPath] = aliasExpression.split(".");
         const alias = this.findAliasByName(aliasName);
         return alias.metadata.findColumnWithPropertyName(propertyPath);
