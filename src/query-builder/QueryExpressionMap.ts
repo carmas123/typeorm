@@ -370,7 +370,7 @@ export class QueryExpressionMap {
     }
 
     /**
-     * Finds alias with the given name.
+     * Finds alias with the given names.
      * If alias was not found it throw an exception.
      */
     findAliasByNameOrNull(aliasName: string): Alias | undefined {
