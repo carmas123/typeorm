@@ -2032,13 +2032,20 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
         const selectString = Object.keys(orderBys)
             .map(orderCriteria => {
                 if (orderCriteria.indexOf(".") !== -1) {
-                    const criteriaParts = orderCriteria.split(".");
+                    const matches = orderCriteria.match(/\((.*?)\)/);
+                    const value = matches ? matches[1] : orderCriteria;
+                    const criteriaParts = value.split(".");
                     const aliasName = criteriaParts[0];
                     const propertyPath = criteriaParts.slice(1).join(".");
                     const a = this.expressionMap.findAliasByNameOrNull(aliasName);
                     if (a) {
                         const alias = a;
-                        const column = alias.metadata.findColumnWithPropertyPath(propertyPath);
+                        var matches2 = propertyPath.match(/\"(.*?)\"/);
+                        const value2 = matches2 ? matches2[1] : propertyPath;
+                        const column = alias.metadata.findColumnWithPropertyPath(value2);
+                        if (matches) {
+                            return orderCriteria.replace(/\((.*?)\)/, "(" + this.escape(parentAlias) + "." + this.escape(DriverUtils.buildAlias(this.connection.driver, aliasName, column!.databaseName)) + ")");
+                        }
                         return this.escape(parentAlias) + "." + this.escape(DriverUtils.buildAlias(this.connection.driver, aliasName, column!.databaseName));
                     } else {
                         return orderCriteria;
@@ -2055,14 +2062,22 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
         const orderByObject: OrderByCondition = {};
         Object.keys(orderBys).forEach(orderCriteria => {
             if (orderCriteria.indexOf(".") !== -1) {
-                const criteriaParts = orderCriteria.split(".");
+                const matches = orderCriteria.match(/\((.*?)\)/);
+                const value = matches ? matches[1] : orderCriteria;
+                const criteriaParts = value.split(".");
                 const aliasName = criteriaParts[0];
                 const propertyPath = criteriaParts.slice(1).join(".");
                 const a = this.expressionMap.findAliasByNameOrNull(aliasName);
                 if (a) {
                     const alias = a;
-                    const column = alias.metadata.findColumnWithPropertyPath(propertyPath);
-                    orderByObject[this.escape(parentAlias) + "." + this.escape(DriverUtils.buildAlias(this.connection.driver, aliasName, column!.databaseName))] = orderBys[orderCriteria];
+                    var matches2 = propertyPath.match(/\"(.*?)\"/);
+                    var value2 = matches2 ? matches2[1] : propertyPath;
+                    const column = alias.metadata.findColumnWithPropertyPath(value2);
+                    var _k = this.escape(parentAlias) + "." + this.escape(DriverUtils.buildAlias(this.connection.driver, aliasName, column!.databaseName));
+                    if (matches) {
+                        _k = orderCriteria.replace(/\((.*?)\)/, "(" + this.escape(parentAlias) + "." + this.escape(DriverUtils.buildAlias(this.connection.driver, aliasName, column!.databaseName)) + ")");
+                    }
+                    orderByObject[_k] = orderBys[orderCriteria];
                 } else {
                     orderByObject[orderCriteria] = orderBys[orderCriteria];
                 }

@@ -363,8 +363,10 @@ export class QueryExpressionMap {
      */
     findAliasByName(aliasName: string): Alias {
         const alias = this.aliases.find(alias => alias.name === aliasName);
-        if (!alias)
+        if (!alias) {
+            console.log("Alias not found:", alias);
             throw new Error(`"${aliasName}" alias was not found. Maybe you forgot to join it?`);
+        }
 
         return alias;
     }
